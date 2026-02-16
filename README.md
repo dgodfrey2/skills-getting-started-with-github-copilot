@@ -14,3 +14,17 @@ Remember, it's self-paced so feel free to take a break! ☕️
 
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
 
+## Running tests
+
+To run the FastAPI tests with pytest, use:
+
+```bash
+pytest
+```
+
+If you prefer to be explicit about the Python module, you can also run:
+
+```bash
+python -m pytest
+```
+
