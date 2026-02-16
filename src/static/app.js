@@ -20,39 +20,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        const participants = details.participants || [];
-        const participantsItems = participants
-          .map(
-            (email) => `
-            <li class="participant-item">
-              <span class="participant-email">${email}</span>
-              <button
-                type="button"
-                class="participant-remove"
-                data-activity="${name}"
-                data-email="${email}"
-                aria-label="Remove ${email} from ${name}"
-              >
-                &times;
-              </button>
-            </li>`
-          )
-          .join("");
-        const participantsList =
-          participants.length > 0
-            ? `<ul>${participantsItems}</ul>`
-            : `<p class="no-participants">No participants yet. Be the first to sign up!</p>`;
+        // Title
+        const titleEl = document.createElement("h4");
+        titleEl.textContent = name;
+        activityCard.appendChild(titleEl);
 
-        activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          <div class="activity-participants">
-            <p class="participants-title"><strong>Participants:</strong></p>
-            ${participantsList}
-          </div>
-        `;
+        // Description
+        const descriptionEl = document.createElement("p");
+        descriptionEl.textContent = details.description;
+        activityCard.appendChild(descriptionEl);
+
+        // Schedule
+        const scheduleEl = document.createElement("p");
+        const scheduleLabel = document.createElement("strong");
+        scheduleLabel.textContent = "Schedule:";
+        scheduleEl.appendChild(scheduleLabel);
+        scheduleEl.appendChild(document.createTextNode(` ${details.schedule}`));
+        activityCard.appendChild(scheduleEl);
+
+        // Availability
+        const availabilityEl = document.createElement("p");
+        const availabilityLabel = document.createElement("strong");
+        availabilityLabel.textContent = "Availability:";
+        availabilityEl.appendChild(availabilityLabel);
+        availabilityEl.appendChild(
+          document.createTextNode(` ${spotsLeft} spots left`)
+        );
+        activityCard.appendChild(availabilityEl);
+
+        // Participants section
+        const participantsSection = document.createElement("div");
+        participantsSection.className = "activity-participants";
+
+        const participantsTitle = document.createElement("p");
+        participantsTitle.className = "participants-title";
+        const participantsTitleStrong = document.createElement("strong");
+        participantsTitleStrong.textContent = "Participants:";
+        participantsTitle.appendChild(participantsTitleStrong);
+        participantsSection.appendChild(participantsTitle);
+
+        const participants = details.participants || [];
+        if (participants.length > 0) {
+          const listEl = document.createElement("ul");
+
+          participants.forEach((email) => {
+            const itemEl = document.createElement("li");
+            itemEl.className = "participant-item";
+
+            const emailEl = document.createElement("span");
+            emailEl.className = "participant-email";
+            emailEl.textContent = email;
+
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "participant-remove";
+            removeButton.dataset.activity = name;
+            removeButton.dataset.email = email;
+            removeButton.setAttribute(
+              "aria-label",
+              `Remove ${email} from ${name}`
+            );
+            removeButton.textContent = "×";
+
+            itemEl.appendChild(emailEl);
+            itemEl.appendChild(removeButton);
+            listEl.appendChild(itemEl);
+          });
+
+          participantsSection.appendChild(listEl);
+        } else {
+          const noParticipantsEl = document.createElement("p");
+          noParticipantsEl.className = "no-participants";
+          noParticipantsEl.textContent =
+            "No participants yet. Be the first to sign up!";
+          participantsSection.appendChild(noParticipantsEl);
+        }
+
+        activityCard.appendChild(participantsSection);
 
         activitiesList.appendChild(activityCard);
 

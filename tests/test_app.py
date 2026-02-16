@@ -59,6 +59,24 @@ def test_signup_fails_for_unknown_activity():
     assert response.json()["detail"] == "Activity not found"
 
 
+def test_signup_fails_when_activity_is_full():
+    activity_name = "Science Olympiad"
+
+    # Fill the activity to its max capacity with dummy emails
+    max_participants = activities[activity_name]["max_participants"]
+    activities[activity_name]["participants"] = [
+        f"student{i}@mergington.edu" for i in range(max_participants)
+    ]
+
+    # Attempting another signup should fail with 400 and "Activity is full"
+    response = client.post(
+        f"/activities/{activity_name}/signup",
+        params={"email": "overflow@mergington.edu"},
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Activity is full"
+
+
 def test_unregister_participant_success_and_not_found_cases():
     activity_name = "Programming Class"
     email = "tempstudent@mergington.edu"
@@ -80,3 +98,28 @@ def test_unregister_participant_success_and_not_found_cases():
     )
     assert response_missing.status_code == 404
     assert response_missing.json()["detail"] == "Student not registered for this activity"
+
+
+def test_unregister_fails_for_unknown_activity():
+    response = client.delete(
+        "/activities/UnknownActivity/signup", params={"email": "x@y.com"}
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Activity not found"
+
+
+def test_signup_rejects_invalid_email_format():
+    response = client.post(
+        "/activities/Chess Club/signup",
+        params={"email": "not-a-valid-email"},
+    )
+    # EmailStr validation should fail and FastAPI should return 422
+    assert response.status_code == 422
+
+
+def test_unregister_rejects_invalid_email_format():
+    response = client.delete(
+        "/activities/Chess Club/signup",
+        params={"email": ""},  # empty string is not a valid email
+    )
+    assert response.status_code == 422
